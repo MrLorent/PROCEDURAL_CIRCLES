@@ -5,9 +5,16 @@ var params = {
 };
 gui.add(params, "Ellipse_Size", 0, 100, 1);
 gui.add(params, "Download_Image");
+var NB_CIRCLES = 15;
+var CIRCLE_SUBS = 100;
 function draw() {
-    background(0);
-    ellipse(mouseX, mouseY, params.Ellipse_Size);
+    background('white');
+    for (var range = 1; range <= NB_CIRCLES; range++) {
+        stroke(0);
+        for (var i = 0; i < CIRCLE_SUBS; i++) {
+            line(width / 2 + 20 * range * cos(i * 2 * PI / CIRCLE_SUBS), height / 2 + 20 * range * sin(i * 2 * PI / CIRCLE_SUBS), width / 2 + 20 * range * cos((i + 1) * 2 * PI / CIRCLE_SUBS), height / 2 + 20 * range * sin((i + 1) * 2 * PI / CIRCLE_SUBS));
+        }
+    }
 }
 function setup() {
     p6_CreateCanvas();
