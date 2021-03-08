@@ -16,29 +16,29 @@ function draw() {
     stroke('black');
     strokeWeight(2.5);
     for (var range = 1; range <= NB_CIRCLES; range++) {
-        beginShape();
+        var pointsCircle = void 0;
         if (range != 10) {
             noiseSeed(random() * 10);
             for (var i = 0; i < params.Circle_Subs; i++) {
                 var angle = i * (TWO_PI / params.Circle_Subs);
                 var radius = 20 + 20 * range;
-                var x = void 0, y = void 0;
-                x = (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * 50) * cos(angle);
-                y = (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * 50) * sin(angle);
-                vertex(x, y);
+                pointsCircle[i][0] = (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * 50) * cos(angle);
+                pointsCircle[i][1] = (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * 50) * sin(angle);
             }
         }
         else {
             for (var i = 0; i < params.Circle_Subs; i++) {
                 var angle = i * (TWO_PI / params.Circle_Subs);
                 var radius = 40 + 20 * range;
-                var x = void 0, y = void 0;
-                x = radius * cos(angle);
-                y = radius * sin(angle);
-                vertex(x, y);
+                pointsCircle[i][0] = radius * cos(angle);
+                pointsCircle[i][1] = radius * sin(angle);
             }
         }
-        endShape(CLOSE);
+        pointsCircle[params.Circle_Subs][0] = pointsCircle[0][0];
+        pointsCircle[params.Circle_Subs][1] = pointsCircle[0][1];
+        for (var i = 0; i < params.Circle_Subs; i++) {
+            line(pointsCircle[i][0], pointsCircle[i][1], pointsCircle[i + 1][0], pointsCircle[i + 1][1]);
+        }
     }
 }
 function setup() {
