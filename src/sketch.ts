@@ -5,7 +5,7 @@
 const gui = new dat.GUI()
 const params = {
     Random_Seed: 0,
-    Circle_Subs: 30,
+    Circle_Subs: 50,
     Download_Image: () => save(),
 }
 gui.add(params, "Random_Seed", 0, 100, 1);
@@ -22,11 +22,11 @@ function draw() {
     background('white');
     translate(width/2, height/2);
 
-    noFill();
+    // noFill();
     stroke('black');
     strokeWeight(2.5);
     for(let range=1; range<=NB_CIRCLES; range++){
-        let pointsCircle;
+        let pointsCircle = new Array();
 
         // ONE CLOSED CURVE DRAWING
         if(range != 10){
@@ -35,32 +35,34 @@ function draw() {
                 const angle = i*(TWO_PI/params.Circle_Subs);
                 const radius = 20 + 20 * range;
                 
-                pointsCircle[i][0] = (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * 50) * cos(angle);
-                pointsCircle[i][1] = (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * 50) * sin(angle);
+                pointsCircle[i] = new Array((radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * 50) * cos(angle),
+                (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * 50) * sin(angle));
             }
         }else{
             for(let i=0; i<params.Circle_Subs; i++){
                 const angle = i*(TWO_PI/params.Circle_Subs);
                 const radius = 40 + 20 * range;
                 
-                pointsCircle[i][0] = radius * cos(angle);
-                pointsCircle[i][1] = radius * sin(angle);
+                pointsCircle[i] = new Array(radius * cos(angle),radius * sin(angle));
             }
         }
 
-        pointsCircle[params.Circle_Subs][0] = pointsCircle[0][0];
-        pointsCircle[params.Circle_Subs][1] = pointsCircle[0][1];
+        pointsCircle[params.Circle_Subs] = new Array(pointsCircle[0][0], pointsCircle[0][1]);
 
         for(let i=0; i<params.Circle_Subs; i++){
-            line(
+            const angle = i*(TWO_PI/params.Circle_Subs);
+            const longRadius = sqrt(pow(pointsCircle[i][0],2) + pow(pointsCircle[i][1],2) + 100);
+
+
+            bezier(
                 pointsCircle[i][0],
                 pointsCircle[i][1],
-                //pointsCircle[i][0],
-                //pointsCircle[i][1],
+                sqrt((pow(pointsCircle[i][0],2)+pow(pointsCircle[i][1],2)) + 100) * cos(i*(TWO_PI/params.Circle_Subs) + (PI/2 - atan(sqrt(pow(pointsCircle[i][0],2)+pow(pointsCircle[i][1],2))/10))),
+                sqrt((pow(pointsCircle[i][0],2)+pow(pointsCircle[i][1],2)) + 100) * sin(i*(TWO_PI/params.Circle_Subs) + (PI/2 - atan(sqrt(pow(pointsCircle[i][0],2)+pow(pointsCircle[i][1],2))/10))),
+                sqrt((pow(pointsCircle[i+1][0],2)+pow(pointsCircle[i+1][1],2)) + 100) * cos((i+1)*(TWO_PI/params.Circle_Subs) - (PI/2 - atan(sqrt(pow(pointsCircle[i+1][0],2)+pow(pointsCircle[i+1][1],2))/10))),
+                sqrt((pow(pointsCircle[i+1][0],2)+pow(pointsCircle[i+1][1],2)) + 100) * sin((i+1)*(TWO_PI/params.Circle_Subs) - (PI/2 - atan(sqrt(pow(pointsCircle[i+1][0],2)+pow(pointsCircle[i+1][1],2))/10))),
                 pointsCircle[i+1][0],
-                pointsCircle[i+1][1],
-                //pointsCircle[i+1][0],
-                //pointsCircle[i+1][1]
+                pointsCircle[i+1][1]
             );
         }
     }
