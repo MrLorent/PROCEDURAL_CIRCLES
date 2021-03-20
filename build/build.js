@@ -1,7 +1,7 @@
 var gui = new dat.GUI();
 var params = {
     Random_Seed: 0,
-    Circle_Subs: 30,
+    Circle_Subs: 10,
     Download_Image: function () { return save(); },
 };
 gui.add(params, "Random_Seed", 0, 100, 1);
@@ -14,30 +14,32 @@ function draw() {
     translate(width / 2, height / 2);
     stroke('black');
     strokeWeight(2.5);
-    for (var range = 1; range <= NB_CIRCLES; range++) {
-        var pointsCircle = new Array();
-        if (range != 10) {
-            noiseSeed(random() * 1000);
-            for (var i = 0; i < params.Circle_Subs; i++) {
-                var angle = i * (TWO_PI / params.Circle_Subs);
-                var radius = 20 + 20 * range;
-                pointsCircle[i] = new Array((radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * 50) * cos(angle), (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * 50) * sin(angle));
-            }
-        }
-        else {
-            for (var i = 0; i < params.Circle_Subs; i++) {
-                var angle = i * (TWO_PI / params.Circle_Subs);
-                var radius = 40 + 20 * range;
-                pointsCircle[i] = new Array(radius * cos(angle), radius * sin(angle));
-            }
-        }
-        pointsCircle[params.Circle_Subs] = new Array(pointsCircle[0][0], pointsCircle[0][1]);
-        for (var i = 0; i < params.Circle_Subs; i++) {
-            var angle = i * (TWO_PI / params.Circle_Subs);
-            var longRadius = sqrt(pow(pointsCircle[i][0], 2) + pow(pointsCircle[i][1], 2) + 100);
-            bezier(pointsCircle[i][0], pointsCircle[i][1], sqrt((pow(pointsCircle[i][0], 2) + pow(pointsCircle[i][1], 2)) + 100) * cos(i * (TWO_PI / params.Circle_Subs) + (PI / 2 - atan(sqrt(pow(pointsCircle[i][0], 2) + pow(pointsCircle[i][1], 2)) / 10))), sqrt((pow(pointsCircle[i][0], 2) + pow(pointsCircle[i][1], 2)) + 100) * sin(i * (TWO_PI / params.Circle_Subs) + (PI / 2 - atan(sqrt(pow(pointsCircle[i][0], 2) + pow(pointsCircle[i][1], 2)) / 10))), sqrt((pow(pointsCircle[i + 1][0], 2) + pow(pointsCircle[i + 1][1], 2)) + 100) * cos((i + 1) * (TWO_PI / params.Circle_Subs) - (PI / 2 - atan(sqrt(pow(pointsCircle[i + 1][0], 2) + pow(pointsCircle[i + 1][1], 2)) / 10))), sqrt((pow(pointsCircle[i + 1][0], 2) + pow(pointsCircle[i + 1][1], 2)) + 100) * sin((i + 1) * (TWO_PI / params.Circle_Subs) - (PI / 2 - atan(sqrt(pow(pointsCircle[i + 1][0], 2) + pow(pointsCircle[i + 1][1], 2)) / 10))), pointsCircle[i + 1][0], pointsCircle[i + 1][1]);
-        }
+    var range = 1;
+    var CIRCLE_SUBS = params.Circle_Subs + range;
+    var BASE_ANGLE = TWO_PI / CIRCLE_SUBS;
+    var BASE_RADIUS = 50 + 20 * range;
+    var previous_anchor = new Array();
+    beginShape();
+    var x = BASE_RADIUS * cos(-BASE_ANGLE);
+    var y = BASE_RADIUS * sin(-BASE_ANGLE);
+    vertex(x, y);
+    previous_anchor[0] = x;
+    previous_anchor[1] = y;
+    for (var i = 0; i < 3; i++) {
+        var anchor_x = void 0, anchor_y = void 0;
+        var control1_x = void 0, control1_y = void 0;
+        var control2_x = void 0, control2_y = void 0;
+        anchor_x = BASE_RADIUS * cos(i * BASE_ANGLE);
+        anchor_y = BASE_RADIUS * sin(i * BASE_ANGLE);
+        control1_x = sqrt((pow(previous_anchor[0], 2) + pow(previous_anchor[1], 2)) + 100) * cos(i * BASE_ANGLE + (PI / 2 - atan(sqrt(pow(previous_anchor[0], 2) + pow(previous_anchor[1], 2)) / 10)));
+        control1_y = sqrt((pow(previous_anchor[0], 2) + pow(previous_anchor[1], 2)) + 100) * sin(i * BASE_ANGLE + (PI / 2 - atan(sqrt(pow(previous_anchor[0], 2) + pow(previous_anchor[1], 2)) / 10)));
+        control2_x = sqrt((pow(anchor_x, 2) + pow(anchor_y, 2)) + 100) * cos(i * BASE_ANGLE - (PI / 2 - atan(sqrt(pow(anchor_x, 2) + pow(anchor_y, 2)) / 10)));
+        control2_y = sqrt((pow(anchor_x, 2) + pow(anchor_y, 2)) + 100) * sin(i * BASE_ANGLE - (PI / 2 - atan(sqrt(pow(anchor_x, 2) + pow(anchor_y, 2)) / 10)));
+        bezierVertex(control1_x, control1_y, control2_x, control2_y, -anchor_x, anchor_y);
+        previous_anchor[0] = anchor_x;
+        previous_anchor[1] = anchor_y;
     }
+    endShape();
 }
 function setup() {
     p6_CreateCanvas();
