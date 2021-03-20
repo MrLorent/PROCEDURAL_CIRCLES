@@ -1,7 +1,7 @@
 var gui = new dat.GUI();
 var params = {
     Random_Seed: 0,
-    Circle_Subs: 50,
+    Circle_Subs: 30,
     Download_Image: function () { return save(); },
 };
 gui.add(params, "Random_Seed", 0, 100, 1);
@@ -17,7 +17,7 @@ function draw() {
     for (var range = 1; range <= NB_CIRCLES; range++) {
         var pointsCircle = new Array();
         if (range != 10) {
-            noiseSeed(random() * 10);
+            noiseSeed(random() * 1000);
             for (var i = 0; i < params.Circle_Subs; i++) {
                 var angle = i * (TWO_PI / params.Circle_Subs);
                 var radius = 20 + 20 * range;

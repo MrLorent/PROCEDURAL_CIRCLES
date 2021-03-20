@@ -5,7 +5,7 @@
 const gui = new dat.GUI()
 const params = {
     Random_Seed: 0,
-    Circle_Subs: 50,
+    Circle_Subs: 30,
     Download_Image: () => save(),
 }
 gui.add(params, "Random_Seed", 0, 100, 1);
@@ -30,7 +30,7 @@ function draw() {
 
         // ONE CLOSED CURVE DRAWING
         if(range != 10){
-            noiseSeed(random() * 10);
+            noiseSeed(random() * 1000);
             for(let i=0; i<params.Circle_Subs; i++){
                 const angle = i*(TWO_PI/params.Circle_Subs);
                 const radius = 20 + 20 * range;
@@ -52,7 +52,6 @@ function draw() {
         for(let i=0; i<params.Circle_Subs; i++){
             const angle = i*(TWO_PI/params.Circle_Subs);
             const longRadius = sqrt(pow(pointsCircle[i][0],2) + pow(pointsCircle[i][1],2) + 100);
-
 
             bezier(
                 pointsCircle[i][0],
