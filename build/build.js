@@ -15,13 +15,22 @@ function draw() {
     stroke('black');
     strokeWeight(2.5);
     for (var range = 0; range < NB_CIRCLES; range++) {
-        var circleAnchors = new Array();
-        if (range != 10) {
+        var circleAnchors = generateCircleAnchors(range);
+        for (var i = 0; i < params.Circle_Subs; i++) {
+            var base_angle = (TWO_PI / params.Circle_Subs);
+            var startControler = generateControleMark(circleAnchors[i], i * (TWO_PI / params.Circle_Subs), 1);
+            var endControler = generateControleMark(circleAnchors[i + 1], (i + 1) * (TWO_PI / params.Circle_Subs), -1);
+            bezier(circleAnchors[i]['x'], circleAnchors[i]['y'], startControler.x, startControler.y, endControler.x, endControler.y, circleAnchors[i + 1]['x'], circleAnchors[i + 1]['y']);
+        }
+    }
+    function generateCircleAnchors(circleNumber) {
+        var anchors = new Array();
+        if (circleNumber != 10) {
             noiseSeed(random() * 1000);
             for (var i = 0; i < params.Circle_Subs; i++) {
                 var angle = i * (TWO_PI / params.Circle_Subs);
-                var radius = 20 + 20 * range;
-                circleAnchors[i] = {
+                var radius = 20 + 20 * circleNumber;
+                anchors[i] = {
                     'x': (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * 50) * cos(angle),
                     'y': (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * 50) * sin(angle)
                 };
@@ -30,19 +39,20 @@ function draw() {
         else {
             for (var i = 0; i < params.Circle_Subs; i++) {
                 var angle = i * (TWO_PI / params.Circle_Subs);
-                var radius = 40 + 20 * range;
-                circleAnchors[i] = {
+                var radius = 40 + 20 * circleNumber;
+                anchors[i] = {
                     'x': radius * cos(angle),
                     'y': radius * sin(angle)
                 };
             }
         }
-        circleAnchors[params.Circle_Subs] = circleAnchors[0];
-        for (var i = 0; i < params.Circle_Subs; i++) {
-            var angle = i * (TWO_PI / params.Circle_Subs);
-            var longRadius = sqrt(pow(circleAnchors[i]['x'], 2) + pow(circleAnchors[i]['y'], 2) + 100);
-            bezier(circleAnchors[i]['x'], circleAnchors[i]['y'], sqrt((pow(circleAnchors[i]['x'], 2) + pow(circleAnchors[i]['y'], 2)) + 100) * cos(i * (TWO_PI / params.Circle_Subs) + (PI / 2 - atan(sqrt(pow(circleAnchors[i]['x'], 2) + pow(circleAnchors[i]['y'], 2)) / 10))), sqrt((pow(circleAnchors[i]['x'], 2) + pow(circleAnchors[i]['y'], 2)) + 100) * sin(i * (TWO_PI / params.Circle_Subs) + (PI / 2 - atan(sqrt(pow(circleAnchors[i]['x'], 2) + pow(circleAnchors[i]['y'], 2)) / 10))), sqrt((pow(circleAnchors[i + 1]['x'], 2) + pow(circleAnchors[i + 1]['y'], 2)) + 100) * cos((i + 1) * (TWO_PI / params.Circle_Subs) - (PI / 2 - atan(sqrt(pow(circleAnchors[i + 1]['x'], 2) + pow(circleAnchors[i + 1]['y'], 2)) / 10))), sqrt((pow(circleAnchors[i + 1]['x'], 2) + pow(circleAnchors[i + 1]['y'], 2)) + 100) * sin((i + 1) * (TWO_PI / params.Circle_Subs) - (PI / 2 - atan(sqrt(pow(circleAnchors[i + 1]['x'], 2) + pow(circleAnchors[i + 1]['y'], 2)) / 10))), circleAnchors[i + 1]['x'], circleAnchors[i + 1]['y']);
-        }
+        anchors[params.Circle_Subs] = anchors[0];
+        return anchors;
+    }
+    function generateControleMark(anchor, angle, orientation) {
+        var x = sqrt((pow(anchor['x'], 2) + pow(anchor['y'], 2)) + 100) * cos(angle + orientation * (PI / 2 - atan(sqrt(pow(anchor['x'], 2) + pow(anchor['y'], 2)) / 10)));
+        var y = sqrt((pow(anchor['x'], 2) + pow(anchor['y'], 2)) + 100) * sin(angle + orientation * (PI / 2 - atan(sqrt(pow(anchor['x'], 2) + pow(anchor['y'], 2)) / 10)));
+        return { 'x': x, 'y': y };
     }
 }
 function setup() {
