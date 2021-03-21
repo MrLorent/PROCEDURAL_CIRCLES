@@ -4,15 +4,15 @@
 
 const gui = new dat.GUI()
 const params = {
-    Random_Seed: 0,
+    Random_Seed: 26,
     Noise_Scale: 50,
     Bezier: 10,
-    Circle_Subs: 33,
+    Circle_Subs: 35,
     lower_diameter : 50,
     Circles_Spacing: 15,
     Download_Image: () => save(),
 }
-gui.add(params, "Random_Seed", 0, 100, 1);
+gui.add(params, "Random_Seed", 0, 100, 0.5);
 gui.add(params, "Noise_Scale", 0, 100, 1);
 gui.add(params, "Bezier", 0, 50, 1);
 gui.add(params, "Circle_Subs", 10, 100, 1);
@@ -32,7 +32,7 @@ function draw() {
 
     noFill();
     stroke('black');
-    strokeWeight(3.0);
+    strokeWeight(3.5);
     for(let range=0; range<NB_CIRCLES; range++){
         const nbSubs = params.Circle_Subs + (range - 10);
         let circleAnchors = generateCircleAnchors(range, nbSubs);
@@ -69,6 +69,14 @@ function draw() {
                     'x' : (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * params.Noise_Scale) * cos(angle),
                     'y' : (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * params.Noise_Scale) * sin(angle)
                 };
+
+                if((circleNumber >= 0 && circleNumber < 3) && (cos(angle) > cos(PI/4) || cos(angle) < cos(3*PI/4))){
+                    anchors[i].x += 5*pow(-1,i);
+                }
+
+                if((circleNumber >= 0 && circleNumber < 3)&& (sin(angle) > sin(PI/4) || sin(angle) < sin(-PI/4))){
+                    anchors[i].y += 10*pow(-1,i);
+                }
             }
         }else{
             for(let i=0; i<nbSubs; i++){
@@ -84,9 +92,10 @@ function draw() {
 
         anchors[nbSubs] = anchors[0];
 
-        if(circleNumber == 3){
+
+        if(circleNumber == 2){
             let pic = int(random(0, nbSubs));
-            anchors[pic].y = anchors[pic].y - (height/2 + anchors[pic].y - 50);
+            anchors[pic].y = anchors[pic].y - (height/2 + anchors[pic].y - 60);
         }
 
         return anchors;
@@ -94,9 +103,30 @@ function draw() {
 
     function generateControlMark(circleNumber, anchor, angle, orientation){
         if(circleNumber != 8){
-            let x = sqrt((pow(anchor['x'],2)+pow(anchor['y'],2)) + pow(params.Bezier, 2)) * cos(angle + orientation * (PI/2 - atan(sqrt(pow(anchor['x'],2)+pow(anchor['y'],2))/(params.Bezier + circleNumber/2))));
+            let x, y;
+            if(anchor.y == 60 - height/2){
+                if(sin(angle) < 0){
+                    x = anchor.x + orientation*5;
+                    y = anchor.y;
+                }else{
+                    x = anchor.x - orientation*5;
+                    y = anchor.y;
+                }
+            }else{
+                if(circleNumber >=0 && circleNumber <3){
+                    if((cos(angle) > cos(PI/4) || cos(angle) < cos(3*PI/4))){
+                        x = anchor.x;
+                        y = anchor.y + cos(angle)/abs(cos(angle))*orientation *params.Bezier;
+                    }else{
+                        x = anchor.x - sin(angle)/abs(sin(angle))*orientation*params.Bezier;
+                        y = anchor.y;
+                    }
+                }else{
+                    x = sqrt((pow(anchor['x'],2)+pow(anchor['y'],2)) + pow(params.Bezier, 2)) * cos(angle + orientation * (PI/2 - atan(sqrt(pow(anchor['x'],2)+pow(anchor['y'],2))/(params.Bezier + circleNumber/2))));
 
-            let y = sqrt((pow(anchor['x'],2)+pow(anchor['y'],2)) + pow(params.Bezier, 2)) * sin(angle + orientation * (PI/2 - atan(sqrt(pow(anchor['x'],2)+pow(anchor['y'],2))/(params.Bezier + circleNumber/2))));
+                    y = sqrt((pow(anchor['x'],2)+pow(anchor['y'],2)) + pow(params.Bezier, 2)) * sin(angle + orientation * (PI/2 - atan(sqrt(pow(anchor['x'],2)+pow(anchor['y'],2))/(params.Bezier + circleNumber/2))));
+                }
+            }
 
             return {'x':x, 'y':y};
         }else{
