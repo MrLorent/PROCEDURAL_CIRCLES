@@ -2,6 +2,7 @@ var gui = new dat.GUI();
 var params = {
     Random_Seed: 26,
     Noise_Scale: 50,
+    Noise_Frequence: 5,
     Bezier: 10,
     Circle_Subs: 35,
     lower_diameter: 50,
@@ -10,6 +11,7 @@ var params = {
 };
 gui.add(params, "Random_Seed", 0, 100, 0.5);
 gui.add(params, "Noise_Scale", 0, 100, 1);
+gui.add(params, "Noise_Frequence", 0, 20, 0.05);
 gui.add(params, "Bezier", 0, 50, 1);
 gui.add(params, "Circle_Subs", 10, 100, 1);
 gui.add(params, "lower_diameter", 0, 100, 1);
@@ -78,8 +80,8 @@ function draw() {
             var angle = i * (TWO_PI / nbSubs);
             var radius = params.lower_diameter + params.Circles_Spacing * circleNumber;
             anchors[i] = {
-                'x': (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * params.Noise_Scale) * cos(angle),
-                'y': (radius + noise(10 + 10 * cos(angle), 10 + 10 * sin(angle)) * params.Noise_Scale) * sin(angle)
+                'x': (radius + noise(params.Noise_Frequence * (1 + cos(angle)), params.Noise_Frequence * (1 + sin(angle))) * params.Noise_Scale) * cos(angle),
+                'y': (radius + noise(params.Noise_Frequence * (1 + cos(angle)), params.Noise_Frequence * (1 * sin(angle))) * params.Noise_Scale) * sin(angle)
             };
             anchors[nbSubs] = anchors[0];
         }
